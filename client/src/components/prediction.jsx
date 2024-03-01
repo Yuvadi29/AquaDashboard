@@ -6,6 +6,7 @@ import '../css/prediction.css';
 import logo from '../images/logo.png';
 import { IgrRadialGaugeModule } from 'igniteui-react-gauges';
 import { IgrRadialGauge, IgrRadialGaugeRange } from 'igniteui-react-gauges';
+import axios from 'axios';
 
 IgrRadialGaugeModule.register();
 
@@ -50,17 +51,18 @@ function WaterQualityAnalysis() {
 
   const fetchData = async () => {
     try {
-      const response1 = await fetch('https://blynk.cloud/external/api/get?token=WfQITWPhO1JeF3zrRGXvt09vi14Ekms-&v5');
-      const response2 = await fetch('https://blynk.cloud/external/api/get?token=WfQITWPhO1JeF3zrRGXvt09vi14Ekms-&v6');
+      // const response1 = await fetch('https://blynk.cloud/external/api/get?token=WfQITWPhO1JeF3zrRGXvt09vi14Ekms-&v5');
+      const response1 = await axios.get('http:localhost:3000/api/aqua/data');
+      // const response2 = await fetch('https://blynk.cloud/external/api/get?token=WfQITWPhO1JeF3zrRGXvt09vi14Ekms-&v6');
 
       const data1 = await response1.json();
-      const data2 = await response2.json();
+      // const data2 = await response2.json();
 
       setTemp1(data1);
-      setTemp2(data2);
+      // setTemp2(data2);
 
       console.log("Temp Sensor 1 Data: ", data1);
-      console.log("Temp Sensor 2 Data: ", data2);
+      // console.log("Temp Sensor 2 Data: ", data2);
 
       updateChart(data1, data2);
     } catch (error) {
@@ -73,7 +75,7 @@ function WaterQualityAnalysis() {
   const updateChart = (data1, data2) => {
     const ctx = document.getElementById('myChart').getContext('2d');
     const maxDataPoints = 15;
-  
+
     if (myChart) {
       // If chart exists, update the data
       if (myChart.data.labels.length >= maxDataPoints) {
@@ -123,16 +125,11 @@ function WaterQualityAnalysis() {
       });
     }
   };
-  
+
   useEffect(() => {
     fetchData();
-    const interval = setInterval(() => {
-      fetchData();
-    }, 2000); // Fetch data every 10 seconds
-  
-    return () => clearInterval(interval);
   }, []);
-  
+
 
   const checkIsWaterDrinkable = (temperatureValue) => {
     if (temperatureValue > 25 && temperatureValue < 32) {
